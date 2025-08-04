@@ -106,11 +106,11 @@ def init_project_files(project_name):
     if not os.path.exists(structure_path):
         with open(structure_path, 'w') as f:
             defaultObj = {
-                "key":{
-                    "default": [],
-                    "focus": [],
-                    "hover": []
-                },
+                #"key":{
+                #    "default": [],
+                #    "focus": [],
+                #    "hover": []
+                #},
                 "value":{
                     #".class1:hover" : {
                     #    "background": "#123123",
@@ -323,42 +323,27 @@ def handle_draw():
                 'label': request.form.get('label'),  # 类名或ID
                 'target': request.form.get('target'),  # 'background' 等
                 'value': request.form.get('value'),  # 颜色值
-                #'state': request.form.get('state'), #focues hover 等
+                'state': request.form.get('state'), #focus hover 等
                 #'index': len(structure)  # 索引为当前长度（最后一位）
             }
             
             
+            """
             # 添加新记录
             structure.append(draw_data)
             
             # 保存更新后的结构
             with open(structure_path, 'w') as f:
                 json.dump(structure, f, indent=2)
+            """
+            CssBuilder.appendStructure(project_name, draw_data)
             
             # 重新生成CSS文件
-            generate_css_from_structure(project_name)
+            CssBuilder.build(project_name)
 
         elif method == 'undo':
-            # 撤销操作 - 删除首行记录
-            structure_path = get_structure_path(project_name)
-            
-            with open(structure_path, 'r') as f:
-                structure = json.load(f)
-            
-            # 如果有记录则删除第一条
-            if structure:
-                structure.pop(-1)
-                
-                # 更新索引（重新编号）
-                for i, item in enumerate(structure):
-                    item['index'] = i
-                
-                # 保存更新
-                with open(structure_path, 'w') as f:
-                    json.dump(structure, f, indent=2)
-                
-                # 重新生成CSS文件
-                generate_css_from_structure(project_name)
+            CssBuilder.undo(project_name)
+            CssBuilder.build(project_name)
 
         return jsonify({'status': 'ok'})
     except Exception as e:
