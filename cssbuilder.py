@@ -82,37 +82,46 @@ class CssBuilder:
                 #'index': len(structure)  # 索引为当前长度（最后一位）
             }
         """
-
         structureObj = CssBuilder.getStructureFile(project_name)
         structure_path = os.path.join(ROOT_PATH,project_name,"structure.json")
-
-        which = draw_data["which"]
-        label = draw_data["label"]
-        target = draw_data["target"]
-        value = draw_data["value"]
-        state = draw_data["state"]
-
+        print("draw_data",draw_data,"UNDO",UNDO)
+        if draw_data:
         
-        with open(structure_path,"w") as file:
-            key_head = "." if which == "class" else "#"
-            key_head += label
+            which = draw_data["which"]
+            label = draw_data["label"]
+            target = draw_data["target"]
+            value = draw_data["value"]
+            state = draw_data["state"]
 
-            #if label not in  structureObj["key"][state]:
-            #    structureObj["key"][state].append(key_head)
-            
-            final_key = "{0}:{1}".format(key_head,state)
-            if state == "default":
-                final_key = key_head
-            
-            if not structureObj["value"][final_key]:
-                structureObj["value"][final_key] = {}
+            with open(structure_path,"w") as file:
+                key_head = "." if which == "class" else "#"
+                key_head += label
 
-            structureObj["value"][final_key][target] = value
+                #if label not in  structureObj["key"][state]:
+                #    structureObj["key"][state].append(key_head)
+                
+                final_key = "{0}:{1}".format(key_head,state)
+                if state == "default":
+                    final_key = key_head
+                
+                if final_key not in structureObj["value"]:
+                    structureObj["value"][final_key] = {}
 
-            json.dump(structureObj,file,indent=2)
+                structureObj["value"][final_key][target] = value
+
+                
+
+                json.dump(structureObj,file,indent=2)
+        else:
+            with open(structure_path,"w") as file:
+                pre_data = {
+                    "value": {}
+                }
+                json.dump(pre_data,file,indent=2)
+            CssBuilder.build(project_name)
 
         if not UNDO:
-            CssBuilder.appendHistory(key_head,draw_data)
+            CssBuilder.appendHistory(project_name,draw_data)
 
     @staticmethod
     def appendHistory(project_name,draw_data):
@@ -127,16 +136,22 @@ class CssBuilder:
         history_path = os.path.join(ROOT_PATH,project_name,"history.json")
         with open(history_path,"r") as file:
             history_obj = json.load(file)
-            for raw_data in history_obj:
-                CssBuilder.appendStructure(project_name,raw_data,True)
+            if len(history_obj) > 0:
+                for raw_data in history_obj:
+                    CssBuilder.appendStructure(project_name,raw_data,True)
+            else:
+                CssBuilder.appendStructure(project_name,{},True)
 
     @staticmethod
     def undo(project_name):
         history_obj = CssBuilder.getHistoryFile(project_name)
         if history_obj:
             history_obj.pop()
+            history_path = os.path.join(ROOT_PATH,project_name,"history.json")
+            with open(history_path,"w") as file:
+                json.dump(history_obj,file,indent=2)
             CssBuilder.buildStructureFromHistory(project_name)
-        else:
+        else: 
             raise Exception("无法再撤回了")
         
         

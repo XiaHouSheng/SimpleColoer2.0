@@ -102,7 +102,9 @@ def get_css_path(project_name):
 def init_project_files(project_name):
     """初始化项目所需的文件（structure.json和CSS）"""
     structure_path = get_structure_path(project_name)
+    print(structure_path)
     history_path = get_history_path(project_name)
+    print(history_path)
     if not os.path.exists(structure_path):
         with open(structure_path, 'w') as f:
             defaultObj = {
@@ -118,13 +120,15 @@ def init_project_files(project_name):
                     #}
                 }
             }
-            json.dump({}, f, indent=2)
+            json.dump(defaultObj, f, indent=2)
+            #print("ok structure")
     
     # history.json文件
-    if not os.path.exists(history_path, 'w'):
-        with open(structure_path, 'w') as f:
+    if not os.path.exists(history_path):
+        with open(history_path, 'w') as f:
             defaultObj = []
-            json.dump({}, f, indent=2)
+            json.dump(defaultObj, f, indent=2)
+            #print("ok history")
 
     # 确保CSS文件存在
     css_path = get_css_path(project_name)
@@ -311,11 +315,11 @@ def handle_draw():
         if method == 'action':
             """整合在cssbuilder中"""
             # 处理绘图操作 - 新增记录到structure.json
-            structure_path = get_structure_path(project_name)
+            #structure_path = get_structure_path(project_name)
             
             # 读取现有结构数据
-            with open(structure_path, 'r') as f:
-                structure = json.load(f)
+            #with open(structure_path, 'r') as f:
+            #    structure = json.load(f)
             
             # 获取绘图参数
             draw_data = {
@@ -343,7 +347,6 @@ def handle_draw():
 
         elif method == 'undo':
             CssBuilder.undo(project_name)
-            CssBuilder.build(project_name)
 
         return jsonify({'status': 'ok'})
     except Exception as e:
