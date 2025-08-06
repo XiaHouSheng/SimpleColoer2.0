@@ -1,6 +1,14 @@
-# SimpleColor 2.0
+<img width="408" height="114" alt="image" src="https://github.com/user-attachments/assets/5de84cef-c8fc-4b01-89aa-50e3dcd49b10" /># SimpleColor 2.0
 
 SimpleColor 2.0 是一个基于AI的网站配色方案生成与管理工具，能够帮助开发者快速生成符合需求的配色方案，并自动构建对应的CSS样式文件，简化前端开发中的色彩管理流程。
+
+**当前处于开发阶段**
+## 开发计划
+- **border属性的solid与radius添加**
+- **导出Css文件**
+- **变量命名法，调整css**
+
+
 
 ## 功能特点
 
